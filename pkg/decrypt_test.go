@@ -3,8 +3,8 @@ package decrypt_test
 import (
 	"bytes"
 	"encoding/base64"
+	"github.com/denysvitali/tesla-firmware-decrypt/pkg"
 	"os"
-	decrypt "tesla-firmware-decrypt/pkg"
 	"testing"
 )
 
