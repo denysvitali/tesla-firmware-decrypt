@@ -16,21 +16,22 @@ func (d *Decrypt) Decrypt(reader io.Reader, writer io.Writer) error {
 		return fmt.Errorf("key must be 32 bytes long")
 	}
 	blockNumber := 0
+
+	nonceBytes := make([]byte, 24)
+	block := make([]byte, 256)
+	outBlock := make([]byte, 256)
 	for {
-		nonceBytes := make([]byte, 24)
 		binary.LittleEndian.PutUint64(nonceBytes, uint64(blockNumber))
-		block := make([]byte, 256)
-		_, err := reader.Read(block)
+		blockBytes, err := reader.Read(block)
 		if err == io.EOF {
 			return nil
 		}
 		if err != nil {
 			return fmt.Errorf("unable to read file: %v", err)
 		}
-		outBlock := make([]byte, 256)
 		salsa20.XORKeyStream(outBlock, block, nonceBytes, (*[32]byte)(d.Key))
 		blockNumber++
-		_, err = writer.Write(outBlock)
+		_, err = writer.Write(outBlock[0:blockBytes])
 		if err != nil {
 			return fmt.Errorf("unable to write: %v", err)
 		}
